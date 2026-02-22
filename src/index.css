@@ -62,7 +62,7 @@
   --color-brand-muted: #6B6B6B;
 
   /* Typography */
-  --font-body: 'Merriweather', ui-serif, Georgia, serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
