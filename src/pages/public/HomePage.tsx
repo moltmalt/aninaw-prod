@@ -11,36 +11,7 @@ import { StoryCardVertical } from '@/components/ui/StoryCardVertical';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 
 // ══════════════════════════════════════════
-// SECTION 1: Breaking News Ticker (Keep as is, fits top bar)
-// ══════════════════════════════════════════
-function BreakingNewsTicker({ stories }: { stories: Story[] }) {
-    if (stories.length === 0) return null;
-    return (
-        <div className="overflow-hidden bg-brand-primary text-white">
-            <div className="mx-auto flex max-w-7xl items-center px-4 py-2 sm:px-6 lg:px-8">
-                <span className="mr-4 shrink-0 rounded bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-                    Breaking
-                </span>
-                <div className="overflow-hidden">
-                    <div className="animate-marquee flex whitespace-nowrap">
-                        {stories.concat(stories).map((story, i) => (
-                            <Link
-                                key={`${story.id}-${i}`}
-                                to={`/story/${story.slug}`}
-                                className="mr-8 inline-block text-sm font-medium hover:underline tracking-wide"
-                            >
-                                {story.title}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ══════════════════════════════════════════
-// SECTION 2: Block 1 - Recent News
+// SECTION 1: Block 1 - Recent News
 // ══════════════════════════════════════════
 function RecentNewsBlock({ heroStory, latestNews }: { heroStory: Story | null, latestNews: Story[] }) {
     return (
@@ -203,7 +174,6 @@ function HomePageSkeleton() {
 // ══════════════════════════════════════════
 export default function HomePage() {
     const {
-        breakingStories,
         heroStory,
         featuredStories,
         latestNews,
@@ -217,8 +187,6 @@ export default function HomePage() {
 
     return (
         <div className="bg-background">
-            <BreakingNewsTicker stories={breakingStories} />
-
             <RecentNewsBlock heroStory={heroStory} latestNews={latestNews} />
 
             <TopNewsDarkBlock featuredStories={featuredStories} />
