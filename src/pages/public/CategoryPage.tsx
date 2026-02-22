@@ -8,7 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { StoryCardHorizontal } from '@/components/ui/StoryCardHorizontal';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
-import { BannerAdPlaceholder } from '@/components/ui/BannerAdPlaceholder';
 
 export default function CategoryPage() {
     const { category } = useParams<{ category: string }>();
@@ -143,8 +142,6 @@ export default function CategoryPage() {
                             ))}
                         </div>
                     </div>
-
-                    <BannerAdPlaceholder className="h-[400px]" />
 
                     {/* Popular Tags Cloud */}
                     <div>

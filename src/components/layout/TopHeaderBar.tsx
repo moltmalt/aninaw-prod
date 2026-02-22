@@ -18,7 +18,6 @@ export default function TopHeaderBar() {
                         {today}
                     </div>
                     <div className="hidden sm:flex items-center gap-4 ml-4 pl-4 border-l border-white/20">
-                        <Link to="/about" className="hover:text-white transition-colors">Advertisement</Link>
                         <Link to="/about" className="hover:text-white transition-colors">About</Link>
                         <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
                     </div>

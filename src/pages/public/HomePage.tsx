@@ -8,7 +8,6 @@ import type { Story } from '@/types';
 import { StoryCardOverlay } from '@/components/ui/StoryCardOverlay';
 import { StoryCardHorizontal } from '@/components/ui/StoryCardHorizontal';
 import { StoryCardVertical } from '@/components/ui/StoryCardVertical';
-import { BannerAdPlaceholder } from '@/components/ui/BannerAdPlaceholder';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 
 // ══════════════════════════════════════════
@@ -173,13 +172,6 @@ function TopNewsLightFeed({ opinions, latest, mostRead }: { opinions: Story[], l
                         </div>
                     </div>
 
-                    {/* Sidebar Ad Banner */}
-                    <div className="w-full h-[400px] sm:h-[600px] bg-muted flex flex-col items-center justify-center p-4">
-                        <span className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Advertisement</span>
-                        <div className="w-full max-w-[300px] h-[500px] border-2 border-dashed border-border flex items-center justify-center text-muted-foreground/50 font-bold text-center">
-                            300x500 Ad Unit
-                        </div>
-                    </div>
                 </div>
 
             </div>
@@ -229,15 +221,9 @@ export default function HomePage() {
 
             <RecentNewsBlock heroStory={heroStory} latestNews={latestNews} />
 
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 my-2">
-                <BannerAdPlaceholder className="h-24 sm:h-32 bg-brand-primary/5 border-brand-primary/20 text-brand-primary" text="Premium Ad Space" />
-            </div>
-
             <TopNewsDarkBlock featuredStories={featuredStories} />
 
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 mt-4 border-b border-border">
-                <BannerAdPlaceholder className="h-24" />
-            </div>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 mt-4 border-b border-border"></div>
 
             <TopNewsLightFeed opinions={latestOpinions} latest={latestFeatures} mostRead={mostRead} />
         </div>
