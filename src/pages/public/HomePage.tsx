@@ -5,9 +5,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useHomePageData } from '@/hooks/useHomePageData';
 import { formatRelativeTime, truncateText, cn } from '@/lib/utils';
 import type { Story, StoryCategory } from '@/types';
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Send } from 'lucide-react';
 
 // ── Category color mapping ──
 const categoryColors: Record<StoryCategory, string> = {
@@ -406,79 +403,6 @@ function MostReadSection({ stories }: { stories: Story[] }) {
     );
 }
 
-// ══════════════════════════════════════════
-// SECTION 8: Newsletter Signup Banner
-// ══════════════════════════════════════════
-
-function NewsletterBanner() {
-    const [email, setEmail] = useState('');
-    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-    const [message, setMessage] = useState('');
-
-    const handleSubscribe = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!email.trim()) return;
-        setStatus('loading');
-        try {
-            const { error } = await supabase
-                .from('newsletter_subscribers')
-                .insert({ email: email.trim(), is_active: true } as never);
-            if (error) {
-                if (error.code === '23505') {
-                    setMessage("You're already subscribed!");
-                    setStatus('success');
-                } else throw error;
-            } else {
-                setMessage('Welcome aboard! Check your inbox.');
-                setStatus('success');
-                setEmail('');
-            }
-        } catch {
-            setMessage('Something went wrong. Try again.');
-            setStatus('error');
-        }
-        setTimeout(() => { setStatus('idle'); setMessage(''); }, 4000);
-    };
-
-    return (
-        <section className="bg-brand-primary">
-            <div className="mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 lg:px-8">
-                <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">
-                    Stay Informed. Stay Independent.
-                </h2>
-                <p className="mx-auto mt-3 max-w-xl text-sm text-white/70 sm:text-base">
-                    Get Aninaw's stories delivered straight to your inbox. No spam, just honest journalism from Cebu.
-                </p>
-                <form
-                    onSubmit={handleSubscribe}
-                    className="mx-auto mt-6 flex max-w-md gap-2"
-                >
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="your@email.com"
-                        required
-                        className="flex-1 rounded-md border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/40 outline-none backdrop-blur-sm transition-colors focus:border-white/50"
-                    />
-                    <button
-                        type="submit"
-                        disabled={status === 'loading'}
-                        className="flex items-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-brand-primary transition-colors hover:bg-white/90 disabled:opacity-50"
-                    >
-                        <Send className="h-4 w-4" />
-                        Subscribe
-                    </button>
-                </form>
-                {message && (
-                    <p className={`mt-3 text-sm ${status === 'error' ? 'text-red-200' : 'text-green-200'}`}>
-                        {message}
-                    </p>
-                )}
-            </div>
-        </section>
-    );
-}
 
 // ══════════════════════════════════════════
 // LOADING SKELETON
@@ -558,7 +482,6 @@ export default function HomePage() {
             <FeaturesSection stories={latestFeatures} />
             <OpinionsSection stories={latestOpinions} />
             <MostReadSection stories={mostRead} />
-            <NewsletterBanner />
         </>
     );
 }
