@@ -36,10 +36,10 @@ export default function Header() {
     return (
         <header
             className={cn(
-                'sticky top-0 z-50 w-full border-b transition-all duration-300',
+                'sticky top-0 z-50 w-full transition-all duration-300',
                 scrolled
-                    ? 'border-border/60 bg-white shadow-sm py-1'
-                    : 'border-transparent bg-white py-2'
+                    ? 'bg-white shadow-sm py-2'
+                    : 'bg-white py-4'
             )}
         >
             <div className="mx-auto grid h-16 max-w-7xl grid-cols-2 lg:grid-cols-3 items-center px-4 sm:px-6 lg:px-8">

@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 import type { Story } from '@/types';
 import { cn } from '@/lib/utils';
-import { CategoryBadge } from './CategoryBadge';
-import { AuthorLine } from './AuthorLine';
+import { formatRelativeTime } from '@/lib/utils';
 
 interface StoryCardOverlayProps {
     story: Story;
@@ -14,7 +13,7 @@ export function StoryCardOverlay({ story, className }: StoryCardOverlayProps) {
     return (
         <Link
             to={`/story/${story.slug}`}
-            className={cn("group relative block overflow-hidden rounded-xl bg-brand-black", className)}
+            className={cn("group relative block overflow-hidden rounded-3xl bg-brand-black", className)}
         >
             <div className="absolute inset-0 z-0">
                 {story.cover_image_url ? (
@@ -32,22 +31,22 @@ export function StoryCardOverlay({ story, className }: StoryCardOverlayProps) {
             <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
             {/* Content Container */}
-            <div className="absolute inset-x-0 bottom-0 z-20 p-5 sm:p-8 flex flex-col justify-end">
-                <CategoryBadge category={story.category} className="w-fit mb-3" />
-
-                <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-white mb-4 group-hover:text-brand-primary hover:underline decoration-2 underline-offset-4 transition-all">
-                    {story.title}
-                </h2>
-
-                <div className="flex items-center gap-4 text-white/80">
-                    <AuthorLine story={story} className="text-white/80" />
-                    {story.reading_time_minutes && (
-                        <span className="flex items-center gap-1.5 text-xs font-medium tracking-wide">
-                            <Clock className="h-3.5 w-3.5 opacity-70" />
-                            {story.reading_time_minutes} min read
+            <div className="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-10 flex flex-col justify-end">
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="bg-brand-primary text-brand-black px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                        {story.category}
+                    </span>
+                    {story.published_at && (
+                        <span className="flex items-center gap-1.5 text-white/90 text-sm font-medium">
+                            <Clock className="h-4 w-4" />
+                            {formatRelativeTime(story.published_at)}
                         </span>
                     )}
                 </div>
+
+                <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-white group-hover:text-brand-primary hover:underline decoration-2 underline-offset-4 transition-all max-w-4xl">
+                    {story.title}
+                </h2>
             </div>
         </Link>
     );
