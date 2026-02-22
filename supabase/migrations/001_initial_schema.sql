@@ -317,10 +317,9 @@ CREATE POLICY stories_auth_update ON stories
   FOR UPDATE TO authenticated
   USING (true)
   WITH CHECK (
-    -- If setting status to 'published', user must be editor or super_admin
+    -- User must be editor or super_admin to save a story as 'published'
     CASE
-      WHEN status = 'published' AND OLD.status IS DISTINCT FROM 'published'
-        THEN auth_is_editor_or_admin()
+      WHEN status = 'published' THEN auth_is_editor_or_admin()
       ELSE true
     END
   );
