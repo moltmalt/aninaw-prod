@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import type { UserRole } from '@/types';
 
 // Layouts
 import { PublicLayout } from '@/components/layout/PublicLayout';
@@ -20,8 +21,10 @@ import AboutPage from '@/pages/public/AboutPage';
 import ContactPage from '@/pages/public/ContactPage';
 
 // Admin pages
-import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
-import AdminStoriesPage from '@/pages/admin/AdminStoriesPage';
+import AdminLogin from '@/pages/admin/Login';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import Dashboard from '@/pages/admin/Dashboard';
+import StoriesList from '@/pages/admin/StoriesList';
 import AdminStoryNewPage from '@/pages/admin/AdminStoryNewPage';
 import AdminStoryEditPage from '@/pages/admin/AdminStoryEditPage';
 import AdminMediaPage from '@/pages/admin/AdminMediaPage';
@@ -53,10 +56,17 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
         </Route>
 
+        {/* ── Admin Login ── */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+
         {/* ── Admin routes ── */}
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<AdminDashboardPage />} />
-          <Route path="/admin/stories" element={<AdminStoriesPage />} />
+        <Route element={
+          <ProtectedRoute allowedRoles={['admin' as UserRole, 'editor' as UserRole, 'reporter' as UserRole]}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="/admin" element={<Dashboard />} />
+          <Route path="/admin/stories" element={<StoriesList />} />
           <Route path="/admin/stories/new" element={<AdminStoryNewPage />} />
           <Route path="/admin/stories/:id/edit" element={<AdminStoryEditPage />} />
           <Route path="/admin/media" element={<AdminMediaPage />} />

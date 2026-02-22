@@ -1,78 +1,139 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import {
     LayoutDashboard,
     FileText,
-    Image,
+    UploadCloud,
+    Users,
+    Tags,
     Settings,
+    Activity,
     LogOut,
+    Menu,
+    Bell
 } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
-
-const sidebarLinks = [
-    { to: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/admin/stories', label: 'Stories', icon: FileText },
-    { to: '/admin/media', label: 'Media', icon: Image },
-    { to: '/admin/settings', label: 'Settings', icon: Settings },
-];
+import { Button } from '@/components/ui/button';
 
 export default function AdminLayout() {
+    const { user, signOut } = useAuthStore();
     const location = useLocation();
-    const signOut = useAuthStore((s) => s.signOut);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+    const navItems = [
+        { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+        { name: 'Stories', path: '/admin/stories', icon: FileText },
+        { name: 'Import', path: '/admin/import', icon: UploadCloud },
+        { name: 'Authors', path: '/admin/authors', icon: Users },
+        { name: 'Taxonomy', path: '/admin/taxonomy', icon: Tags },
+        { name: 'Settings', path: '/admin/settings', icon: Settings },
+        { name: 'Audit Log', path: '/admin/audit', icon: Activity },
+    ];
+
+    // Helper to get a generic page title from path
+    const getPageTitle = () => {
+        const currentPath = location.pathname;
+        if (currentPath === '/admin') return 'Dashboard';
+        const match = navItems.find(item => currentPath.startsWith(item.path) && item.path !== '/admin');
+        if (match) return match.name;
+        if (currentPath.includes('/admin/stories/new')) return 'New Story';
+        return 'Admin Portal';
+    };
 
     return (
-        <div className="dark flex min-h-screen bg-background text-foreground">
+        <div className="flex min-h-screen bg-muted/10 dark:bg-background">
             {/* Sidebar */}
-            <aside className="flex w-60 flex-col border-r border-border bg-card">
-                <div className="flex h-16 items-center border-b border-border px-6">
-                    <Link to="/admin" className="flex items-center gap-2">
-                        <span className="font-display text-xl font-bold text-brand-primary">
-                            Aninaw
-                        </span>
-                        <span className="rounded bg-brand-primary/10 px-1.5 py-0.5 text-xs font-semibold text-brand-primary">
-                            Admin
-                        </span>
-                    </Link>
+            <aside
+                className={`flex flex-col border-r border-border bg-card transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-[72px]'
+                    }`}
+            >
+                <div className="flex h-16 shrink-0 items-center border-b border-border px-4">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className="mr-2"
+                        title="Toggle Sidebar"
+                    >
+                        <Menu className="h-5 w-5 text-muted-foreground" />
+                    </Button>
+                    {isSidebarOpen && (
+                        <a href="/admin" className="font-display text-xl font-bold italic tracking-tighter">
+                            Aninaw.
+                        </a>
+                    )}
                 </div>
 
-                <nav className="flex flex-1 flex-col gap-1 p-4">
-                    {sidebarLinks.map(({ to, label, icon: Icon }) => {
-                        const isActive =
-                            to === '/admin'
-                                ? location.pathname === '/admin'
-                                : location.pathname.startsWith(to);
-                        return (
-                            <Link
-                                key={to}
-                                to={to}
-                                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${isActive
-                                        ? 'bg-brand-primary/10 text-brand-primary'
-                                        : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-                                    }`}
-                            >
-                                <Icon className="h-4 w-4" />
-                                {label}
-                            </Link>
-                        );
-                    })}
+                <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+                    {navItems.map((item) => (
+                        <NavLink
+                            key={item.name}
+                            to={item.path}
+                            end={item.path === '/admin'} // strict match only for dashboard root
+                            className={({ isActive }) => `
+                                flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors
+                                ${isActive
+                                    ? 'bg-brand-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                }
+                            `}
+                            title={!isSidebarOpen ? item.name : undefined}
+                        >
+                            <item.icon className="h-5 w-5 shrink-0" />
+                            {isSidebarOpen && <span>{item.name}</span>}
+                        </NavLink>
+                    ))}
                 </nav>
 
-                <div className="border-t border-border p-4">
-                    <button
-                        onClick={() => signOut()}
-                        className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                    >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                    </button>
+                <div className="border-t border-border p-3">
+                    {isSidebarOpen ? (
+                        <div className="flex items-center gap-3 rounded-md p-2 hover:bg-muted transition-colors">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary/20 text-brand-primary font-bold uppercase shrink-0">
+                                {user?.email?.[0] || 'A'}
+                            </div>
+                            <div className="flex-1 overflow-hidden">
+                                <p className="truncate text-sm font-medium leading-none text-foreground">
+                                    {(user?.user_metadata?.first_name || user?.email?.split('@')[0]) || 'Admin'}
+                                </p>
+                                <p className="truncate text-xs text-muted-foreground mt-1">
+                                    {user?.email}
+                                </p>
+                            </div>
+                            <Button variant="ghost" size="icon" onClick={() => signOut()} title="Sign out" className="shrink-0 h-8 w-8">
+                                <LogOut className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="w-full flex justify-center py-2"
+                            onClick={() => signOut()}
+                            title="Sign out"
+                        >
+                            <LogOut className="h-5 w-5 text-muted-foreground" />
+                        </Button>
+                    )}
                 </div>
             </aside>
 
-            {/* Main content */}
-            <div className="flex flex-1 flex-col">
-                <header className="flex h-16 items-center border-b border-border px-6">
-                    <h1 className="text-lg font-semibold">Admin Dashboard</h1>
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-w-0">
+                {/* Topbar */}
+                <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-8 shadow-sm z-10">
+                    <div className="flex items-center">
+                        <h1 className="text-xl font-bold font-display">{getPageTitle()}</h1>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
+                            <Bell className="h-5 w-5" />
+                            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-brand-primary ring-2 ring-card" />
+                        </Button>
+                    </div>
                 </header>
-                <main className="flex-1 overflow-y-auto p-6">
+
+                {/* Main Content Area */}
+                <main className="flex-1 overflow-auto p-8">
                     <Outlet />
                 </main>
             </div>
