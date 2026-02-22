@@ -237,7 +237,7 @@ export interface Database {
             };
             newsletter_subscribers: {
                 Row: NewsletterSubscriber;
-                Insert: Omit<NewsletterSubscriber, 'id' | 'subscribed_at'>;
+                Insert: Omit<NewsletterSubscriber, 'id' | 'subscribed_at'> & { is_active?: boolean };
                 Update: Partial<Omit<NewsletterSubscriber, 'id' | 'subscribed_at'>>;
             };
             site_settings: {
