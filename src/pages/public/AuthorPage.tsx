@@ -94,8 +94,8 @@ export default function AuthorPage() {
 
             {/* Stories Grid */}
             <div className="mx-auto max-w-5xl">
-                <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
-                    <h2 className="font-display text-2xl font-bold">Articles by {authorProfile?.name || slug}</h2>
+                <div className="mb-6 flex items-center justify-between">
+                    <h2 className="font-display text-xl font-bold">Articles by {authorProfile?.name || slug}</h2>
                     <select
                         value={sort}
                         onChange={(e) => {

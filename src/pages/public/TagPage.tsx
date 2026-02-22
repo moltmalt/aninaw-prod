@@ -39,8 +39,8 @@ export default function TagPage() {
             </header>
 
             <div className="mx-auto max-w-5xl">
-                <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
-                    <h2 className="font-display text-2xl font-bold">All Stories</h2>
+                <div className="mb-6 flex items-center justify-between">
+                    <h2 className="font-display text-xl font-bold">All Stories</h2>
                     <select
                         value={sort}
                         onChange={(e) => {

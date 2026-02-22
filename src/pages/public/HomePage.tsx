@@ -16,8 +16,8 @@ import { CategoryBadge } from '@/components/ui/CategoryBadge';
 function RecentNewsBlock({ heroStory, latestNews }: { heroStory: Story | null, latestNews: Story[] }) {
     return (
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
-                <h2 className="font-display text-2xl font-bold uppercase tracking-wide">Recent News</h2>
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="font-display text-xl font-bold uppercase tracking-wide">Recent News</h2>
                 <div className="flex gap-2">
                     <Link to="/category/news" className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-brand-primary transition-colors border px-3 py-1.5 rounded-sm hover:border-brand-primary">
                         All Recent News
@@ -63,8 +63,8 @@ function TopNewsDarkBlock({ featuredStories }: { featuredStories: Story[] }) {
     return (
         <section className="bg-brand-black py-12 text-white mt-4">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between border-b/20 border-white pb-3 mb-8">
-                    <h2 className="font-display text-2xl font-bold text-white uppercase tracking-wide">In-Depth Features</h2>
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="font-display text-xl font-bold text-white uppercase tracking-wide">In-Depth Features</h2>
                     <Link to="/category/feature" className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-white/50 hover:text-white transition-colors border border-white/20 px-3 py-1.5 rounded-sm hover:border-white">
                         All Features
                     </Link>
@@ -105,8 +105,8 @@ function TopNewsLightFeed({ opinions, latest, mostRead }: { opinions: Story[], l
 
                 {/* Main Feed Column */}
                 <div className="lg:col-span-8">
-                    <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
-                        <h2 className="font-display text-2xl font-bold uppercase tracking-wide">Analysis & Opinion</h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="font-display text-xl font-bold uppercase tracking-wide">Analysis & Opinion</h2>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
@@ -119,8 +119,8 @@ function TopNewsLightFeed({ opinions, latest, mostRead }: { opinions: Story[], l
                 {/* Right Sidebar (Most Read) */}
                 <div className="lg:col-span-4 space-y-8">
                     <div>
-                        <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
-                            <h2 className="font-display text-xl font-bold uppercase tracking-wide">Most Read</h2>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="font-display text-lg font-bold uppercase tracking-wide">Most Read</h2>
                         </div>
                         <div className="flex flex-col gap-5 divide-y divide-border/50">
                             {mostRead.slice(0, 5).map((story, i) => (

@@ -61,8 +61,8 @@ export default function SeriesPage() {
 
             {/* Stories List (Numbered cards) */}
             <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                <div className="mb-8 border-b border-border pb-4">
-                    <h2 className="font-display text-2xl font-bold">Current Episodes / Parts</h2>
+                <div className="mb-8">
+                    <h2 className="font-display text-xl font-bold">Current Episodes / Parts</h2>
                 </div>
 
                 {isLoading ? (

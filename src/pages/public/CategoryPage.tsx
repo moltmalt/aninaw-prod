@@ -44,8 +44,8 @@ export default function CategoryPage() {
             <div className="grid gap-12 lg:grid-cols-4">
                 {/* Main Content: Story Grid */}
                 <div className="lg:col-span-3">
-                    <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
-                        <h2 className="font-display text-2xl font-bold">All Stories</h2>
+                    <div className="mb-6 flex items-center justify-between">
+                        <h2 className="font-display text-xl font-bold">All Stories</h2>
                         <select
                             value={sort}
                             onChange={(e) => {
@@ -109,8 +109,8 @@ export default function CategoryPage() {
                 <aside className="space-y-10 border-l border-border pl-0 lg:pl-8 lg:border-t-0 border-t pt-8 lg:pt-0">
                     {/* Most Read in Category */}
                     <div>
-                        <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
-                            <h3 className="font-display text-xl font-bold uppercase tracking-wide">Most Read</h3>
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="font-display text-lg font-bold uppercase tracking-wide">Most Read</h3>
                         </div>
                         <div className="flex flex-col gap-5 divide-y divide-border/50">
                             {isLoading ? (
