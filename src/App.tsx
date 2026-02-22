@@ -11,7 +11,11 @@ import HomePage from '@/pages/public/HomePage';
 import StoriesPage from '@/pages/public/StoriesPage';
 import StoryDetailPage from '@/pages/public/StoryDetailPage';
 import CategoryPage from '@/pages/public/CategoryPage';
+import TagPage from '@/pages/public/TagPage';
+import AuthorPage from '@/pages/public/AuthorPage';
 import SeriesPage from '@/pages/public/SeriesPage';
+import SearchPage from '@/pages/public/SearchPage';
+import ArchivePage from '@/pages/public/ArchivePage';
 import AboutPage from '@/pages/public/AboutPage';
 import ContactPage from '@/pages/public/ContactPage';
 
@@ -38,9 +42,13 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/stories" element={<StoriesPage />} />
-          <Route path="/stories/:slug" element={<StoryDetailPage />} />
+          <Route path="/story/:slug" element={<StoryDetailPage />} />
           <Route path="/category/:category" element={<CategoryPage />} />
+          <Route path="/tag/:slug" element={<TagPage />} />
+          <Route path="/author/:slug" element={<AuthorPage />} />
           <Route path="/series/:slug" element={<SeriesPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/archive" element={<ArchivePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>

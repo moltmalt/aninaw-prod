@@ -70,7 +70,7 @@ function BreakingNewsTicker({ stories }: { stories: Story[] }) {
                         {stories.concat(stories).map((story, i) => (
                             <Link
                                 key={`${story.id}-${i}`}
-                                to={`/stories/${story.slug}`}
+                                to={`/story/${story.slug}`}
                                 className="mr-8 inline-block text-sm font-medium hover:underline"
                             >
                                 {story.title}
@@ -91,7 +91,7 @@ function HeroSection({ story }: { story: Story | null }) {
     if (!story) return null;
     return (
         <section className="relative">
-            <Link to={`/stories/${story.slug}`} className="group block">
+            <Link to={`/story/${story.slug}`} className="group block">
                 <div className="relative aspect-[21/9] w-full overflow-hidden bg-brand-black sm:aspect-[3/1]">
                     {story.cover_image_url ? (
                         <img
@@ -146,7 +146,7 @@ function SecondaryFeaturedRow({ stories }: { stories: Story[] }) {
                 {stories.map((story) => (
                     <Link
                         key={story.id}
-                        to={`/stories/${story.slug}`}
+                        to={`/story/${story.slug}`}
                         className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"
                     >
                         <div className="aspect-video overflow-hidden bg-muted">
@@ -195,7 +195,7 @@ function LatestNewsStrip({ stories }: { stories: Story[] }) {
                     {stories.map((story) => (
                         <Link
                             key={story.id}
-                            to={`/stories/${story.slug}`}
+                            to={`/story/${story.slug}`}
                             className="group flex shrink-0 w-64 gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50"
                         >
                             <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
@@ -247,7 +247,7 @@ function FeaturesSection({ stories }: { stories: Story[] }) {
             <div className="mt-6 grid gap-6 lg:grid-cols-2">
                 {/* Main (large) card */}
                 <Link
-                    to={`/stories/${mainStory.slug}`}
+                    to={`/story/${mainStory.slug}`}
                     className="group row-span-2 overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"
                 >
                     <div className="aspect-[4/3] overflow-hidden bg-muted">
@@ -280,7 +280,7 @@ function FeaturesSection({ stories }: { stories: Story[] }) {
                     {sideStories.map((story) => (
                         <Link
                             key={story.id}
-                            to={`/stories/${story.slug}`}
+                            to={`/story/${story.slug}`}
                             className="group flex gap-4 rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md"
                         >
                             <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
@@ -327,7 +327,7 @@ function OpinionsSection({ stories }: { stories: Story[] }) {
                         return (
                             <Link
                                 key={story.id}
-                                to={`/stories/${story.slug}`}
+                                to={`/story/${story.slug}`}
                                 className="group flex items-start gap-4 py-5 first:pt-0 last:pb-0"
                             >
                                 {/* Author avatar (prominent) */}
@@ -381,7 +381,7 @@ function MostReadSection({ stories }: { stories: Story[] }) {
                 {stories.map((story, idx) => (
                     <Link
                         key={story.id}
-                        to={`/stories/${story.slug}`}
+                        to={`/story/${story.slug}`}
                         className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-muted/50"
                     >
                         <span className="shrink-0 font-display text-3xl font-bold text-brand-primary/20">
