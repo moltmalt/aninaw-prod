@@ -1,62 +1,19 @@
 import { Link } from 'react-router-dom';
-import { Clock, Eye, User, ChevronRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHomePageData } from '@/hooks/useHomePageData';
-import { formatRelativeTime, truncateText, cn } from '@/lib/utils';
-import type { Story, StoryCategory } from '@/types';
+import type { Story } from '@/types';
 
-// ── Category color mapping ──
-const categoryColors: Record<StoryCategory, string> = {
-    news: 'bg-brand-primary text-white',
-    feature: 'bg-amber-600 text-white',
-    opinion: 'bg-violet-600 text-white',
-    explainer: 'bg-sky-600 text-white',
-    investigative: 'bg-emerald-700 text-white',
-    multimedia: 'bg-pink-600 text-white',
-};
-
-function CategoryBadge({ category }: { category: StoryCategory }) {
-    return (
-        <Badge className={cn('text-[10px] font-semibold uppercase tracking-wider border-0 rounded-sm', categoryColors[category])}>
-            {category}
-        </Badge>
-    );
-}
-
-// ── Author line ──
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function AuthorLine({ story, className }: { story: Story; className?: string }) {
-    // Supabase FK join returns author under `authors` alias
-    const author = (story as any).authors ?? story.author;
-    return (
-        <div className={cn('flex items-center gap-2 text-xs', className)}>
-            {(author as { avatar_url?: string })?.avatar_url ? (
-                <img
-                    src={(author as { avatar_url: string }).avatar_url}
-                    alt=""
-                    className="h-5 w-5 rounded-full object-cover"
-                />
-            ) : (
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted">
-                    <User className="h-3 w-3 text-muted-foreground" />
-                </div>
-            )}
-            <span className="font-medium">{(author as { name?: string })?.name ?? 'Staff'}</span>
-            {story.published_at && (
-                <>
-                    <span className="text-muted-foreground">·</span>
-                    <span className="text-muted-foreground">{formatRelativeTime(story.published_at)}</span>
-                </>
-            )}
-        </div>
-    );
-}
+// New abstractions
+import { StoryCardOverlay } from '@/components/ui/StoryCardOverlay';
+import { StoryCardHorizontal } from '@/components/ui/StoryCardHorizontal';
+import { StoryCardVertical } from '@/components/ui/StoryCardVertical';
+import { BannerAdPlaceholder } from '@/components/ui/BannerAdPlaceholder';
+import { CategoryBadge } from '@/components/ui/CategoryBadge';
 
 // ══════════════════════════════════════════
-// SECTION 1: Breaking News Ticker
+// SECTION 1: Breaking News Ticker (Keep as is, fits top bar)
 // ══════════════════════════════════════════
-
 function BreakingNewsTicker({ stories }: { stories: Story[] }) {
     if (stories.length === 0) return null;
     return (
@@ -71,7 +28,7 @@ function BreakingNewsTicker({ stories }: { stories: Story[] }) {
                             <Link
                                 key={`${story.id}-${i}`}
                                 to={`/story/${story.slug}`}
-                                className="mr-8 inline-block text-sm font-medium hover:underline"
+                                className="mr-8 inline-block text-sm font-medium hover:underline tracking-wide"
                             >
                                 {story.title}
                             </Link>
@@ -84,144 +41,39 @@ function BreakingNewsTicker({ stories }: { stories: Story[] }) {
 }
 
 // ══════════════════════════════════════════
-// SECTION 2: Hero Section
+// SECTION 2: Block 1 - Recent News
 // ══════════════════════════════════════════
-
-function HeroSection({ story }: { story: Story | null }) {
-    if (!story) return null;
+function RecentNewsBlock({ heroStory, latestNews }: { heroStory: Story | null, latestNews: Story[] }) {
     return (
-        <section className="relative">
-            <Link to={`/story/${story.slug}`} className="group block">
-                <div className="relative aspect-[21/9] w-full overflow-hidden bg-brand-black sm:aspect-[3/1]">
-                    {story.cover_image_url ? (
-                        <img
-                            src={story.cover_image_url}
-                            alt={story.cover_image_alt ?? story.title}
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
+        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
+                <h2 className="font-display text-2xl font-bold uppercase tracking-wide">Recent News</h2>
+                <div className="flex gap-2">
+                    <Link to="/category/news" className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-brand-primary transition-colors border px-3 py-1.5 rounded-sm hover:border-brand-primary">
+                        All Recent News
+                    </Link>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Left: Huge Overlay */}
+                <div className="lg:col-span-8">
+                    {heroStory ? (
+                        <StoryCardOverlay story={heroStory} className="h-[400px] sm:h-[500px]" />
                     ) : (
-                        <div className="h-full w-full bg-gradient-to-br from-brand-primary/20 to-brand-black" />
+                        <Skeleton className="h-[400px] sm:h-[500px] w-full rounded-xl" />
                     )}
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-                    {/* Content */}
-                    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10 lg:p-14">
-                        <div className="mx-auto max-w-7xl">
-                            <CategoryBadge category={story.category} />
-                            <h1 className="mt-3 max-w-3xl font-display text-2xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
-                                {story.title}
-                            </h1>
-                            {story.excerpt && (
-                                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
-                                    {truncateText(story.excerpt, 180)}
-                                </p>
-                            )}
-                            <div className="mt-4 flex items-center gap-4">
-                                <AuthorLine story={story} className="text-white/60" />
-                                {story.reading_time_minutes && (
-                                    <span className="flex items-center gap-1 text-xs text-white/50">
-                                        <Clock className="h-3 w-3" />
-                                        {story.reading_time_minutes} min read
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </Link>
-        </section>
-    );
-}
 
-// ══════════════════════════════════════════
-// SECTION 3: Secondary Featured Row
-// ══════════════════════════════════════════
-
-function SecondaryFeaturedRow({ stories }: { stories: Story[] }) {
-    if (stories.length === 0) return null;
-    return (
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {stories.map((story) => (
-                    <Link
-                        key={story.id}
-                        to={`/story/${story.slug}`}
-                        className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"
-                    >
-                        <div className="aspect-video overflow-hidden bg-muted">
-                            {story.cover_image_url ? (
-                                <img
-                                    src={story.cover_image_url}
-                                    alt={story.cover_image_alt ?? story.title}
-                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                            ) : (
-                                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                                    <span className="text-3xl font-bold text-muted-foreground/20 font-display">{story.category}</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className="p-4">
-                            <CategoryBadge category={story.category} />
-                            <h3 className="mt-2 font-display text-lg font-semibold leading-snug group-hover:text-brand-primary transition-colors">
-                                {story.title}
-                            </h3>
-                            <AuthorLine story={story} className="mt-3 text-muted-foreground" />
-                        </div>
-                    </Link>
-                ))}
-            </div>
-        </section>
-    );
-}
-
-// ══════════════════════════════════════════
-// SECTION 4: Latest News Strip
-// ══════════════════════════════════════════
-
-function LatestNewsStrip({ stories }: { stories: Story[] }) {
-    if (stories.length === 0) return null;
-    return (
-        <section className="border-y border-border bg-card py-10">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between">
-                    <h2 className="font-display text-2xl font-bold">Latest News</h2>
-                    <Link to="/category/news" className="flex items-center gap-1 text-sm font-medium text-brand-primary hover:underline">
-                        All News <ChevronRight className="h-4 w-4" />
-                    </Link>
-                </div>
-                <div className="mt-6 flex gap-4 overflow-x-auto pb-2 scrollbar-none">
-                    {stories.map((story) => (
-                        <Link
+                {/* Right: Stack of Horizontals */}
+                <div className="lg:col-span-4 flex flex-col gap-5 divide-y divide-border/50">
+                    {latestNews.slice(0, 4).map((story, i) => (
+                        <StoryCardHorizontal
                             key={story.id}
-                            to={`/story/${story.slug}`}
-                            className="group flex shrink-0 w-64 gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50"
-                        >
-                            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
-                                {story.cover_image_url ? (
-                                    <img
-                                        src={story.cover_image_url}
-                                        alt=""
-                                        className="h-full w-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-primary/10 to-muted">
-                                        <span className="text-[10px] font-bold text-muted-foreground/30 uppercase">News</span>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex flex-col justify-center">
-                                <h4 className="text-sm font-semibold leading-snug line-clamp-2 group-hover:text-brand-primary transition-colors">
-                                    {story.title}
-                                </h4>
-                                {story.published_at && (
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                        {formatRelativeTime(story.published_at)}
-                                    </p>
-                                )}
-                            </div>
-                        </Link>
+                            story={story}
+                            className={i > 0 ? 'pt-5' : ''}
+                            imageClassName="w-24 sm:w-28"
+                        />
                     ))}
                 </div>
             </div>
@@ -230,138 +82,40 @@ function LatestNewsStrip({ stories }: { stories: Story[] }) {
 }
 
 // ══════════════════════════════════════════
-// SECTION 5: Features Section
+// SECTION 3: Block 2 - Top News (Dark Theme)
 // ══════════════════════════════════════════
+function TopNewsDarkBlock({ featuredStories }: { featuredStories: Story[] }) {
+    if (featuredStories.length < 3) return null; // Need enough stories to fill the block gracefully
 
-function FeaturesSection({ stories }: { stories: Story[] }) {
-    if (stories.length === 0) return null;
-    const [mainStory, ...sideStories] = stories;
+    const primaryFeature = featuredStories[0];
+    const secondaryFeatures = featuredStories.slice(1, 5); // Will try to grab 4, but 2 is fine too
+
     return (
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between">
-                <h2 className="font-display text-2xl font-bold">Features</h2>
-                <Link to="/category/feature" className="flex items-center gap-1 text-sm font-medium text-brand-primary hover:underline">
-                    All Features <ChevronRight className="h-4 w-4" />
-                </Link>
-            </div>
-            <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                {/* Main (large) card */}
-                <Link
-                    to={`/story/${mainStory.slug}`}
-                    className="group row-span-2 overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"
-                >
-                    <div className="aspect-[4/3] overflow-hidden bg-muted">
-                        {mainStory.cover_image_url ? (
-                            <img
-                                src={mainStory.cover_image_url}
-                                alt={mainStory.cover_image_alt ?? mainStory.title}
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                        ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-600/10 to-muted" />
-                        )}
-                    </div>
-                    <div className="p-5">
-                        <CategoryBadge category={mainStory.category} />
-                        <h3 className="mt-2 font-display text-xl font-bold leading-snug group-hover:text-brand-primary transition-colors sm:text-2xl">
-                            {mainStory.title}
-                        </h3>
-                        {mainStory.excerpt && (
-                            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                {truncateText(mainStory.excerpt, 150)}
-                            </p>
-                        )}
-                        <AuthorLine story={mainStory} className="mt-3 text-muted-foreground" />
-                    </div>
-                </Link>
-
-                {/* Side stories */}
-                <div className="flex flex-col gap-6">
-                    {sideStories.map((story) => (
-                        <Link
-                            key={story.id}
-                            to={`/story/${story.slug}`}
-                            className="group flex gap-4 rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md"
-                        >
-                            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
-                                {story.cover_image_url ? (
-                                    <img src={story.cover_image_url} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-600/10 to-muted" />
-                                )}
-                            </div>
-                            <div className="flex flex-col justify-center">
-                                <CategoryBadge category={story.category} />
-                                <h4 className="mt-1.5 text-sm font-semibold leading-snug group-hover:text-brand-primary transition-colors">
-                                    {story.title}
-                                </h4>
-                                <AuthorLine story={story} className="mt-2 text-muted-foreground" />
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-}
-
-// ══════════════════════════════════════════
-// SECTION 6: Opinions Section
-// ══════════════════════════════════════════
-
-function OpinionsSection({ stories }: { stories: Story[] }) {
-    if (stories.length === 0) return null;
-    return (
-        <section className="border-y border-border bg-card py-10">
+        <section className="bg-brand-black py-12 text-white mt-4">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between">
-                    <h2 className="font-display text-2xl font-bold">Opinion</h2>
-                    <Link to="/category/opinion" className="flex items-center gap-1 text-sm font-medium text-brand-primary hover:underline">
-                        All Opinions <ChevronRight className="h-4 w-4" />
+                <div className="flex items-center justify-between border-b/20 border-white pb-3 mb-8">
+                    <h2 className="font-display text-2xl font-bold text-white uppercase tracking-wide">In-Depth Features</h2>
+                    <Link to="/category/feature" className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-white/50 hover:text-white transition-colors border border-white/20 px-3 py-1.5 rounded-sm hover:border-white">
+                        All Features
                     </Link>
                 </div>
-                <div className="mt-6 divide-y divide-border">
-                    {stories.map((story) => {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const author = (story as any).authors ?? story.author;
-                        return (
-                            <Link
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                    {/* Left: Large Overlay Feature */}
+                    <div>
+                        <StoryCardOverlay story={primaryFeature} className="h-[450px]" />
+                    </div>
+
+                    {/* Right: 2x2 Grid of smaller features */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+                        {secondaryFeatures.map(story => (
+                            <StoryCardVertical
                                 key={story.id}
-                                to={`/story/${story.slug}`}
-                                className="group flex items-start gap-4 py-5 first:pt-0 last:pb-0"
-                            >
-                                {/* Author avatar (prominent) */}
-                                {(author as { avatar_url?: string })?.avatar_url ? (
-                                    <img
-                                        src={(author as { avatar_url: string }).avatar_url}
-                                        alt=""
-                                        className="h-12 w-12 shrink-0 rounded-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-100">
-                                        <User className="h-5 w-5 text-violet-600" />
-                                    </div>
-                                )}
-                                <div className="flex-1">
-                                    <h4 className="font-display text-base font-semibold leading-snug group-hover:text-brand-primary transition-colors sm:text-lg">
-                                        {story.title}
-                                    </h4>
-                                    {story.excerpt && (
-                                        <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
-                                            {story.excerpt}
-                                        </p>
-                                    )}
-                                    <p className="mt-2 text-xs font-medium text-muted-foreground">
-                                        By {(author as { name?: string })?.name ?? 'Staff'}
-                                        {story.published_at && ` · ${formatRelativeTime(story.published_at)}`}
-                                    </p>
-                                </div>
-                                <span className="hidden shrink-0 text-sm font-medium text-brand-primary opacity-0 transition-opacity group-hover:opacity-100 sm:inline">
-                                    Read →
-                                </span>
-                            </Link>
-                        );
-                    })}
+                                story={story}
+                                className="text-white group [&_h3]:text-white group-hover:[&_h3]:text-brand-primary [&_span.text-muted-foreground]:text-white/60"
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>
@@ -369,83 +123,82 @@ function OpinionsSection({ stories }: { stories: Story[] }) {
 }
 
 // ══════════════════════════════════════════
-// SECTION 7: Most Read This Week
+// SECTION 4: Block 3 - Top News (Light Theme Feed)
 // ══════════════════════════════════════════
+function TopNewsLightFeed({ opinions, latest, mostRead }: { opinions: Story[], latest: Story[], mostRead: Story[] }) {
+    // Combine some feed data for the left column
+    const feedStories = [...opinions.slice(0, 3), ...latest.slice(0, 3)];
 
-function MostReadSection({ stories }: { stories: Story[] }) {
-    if (stories.length === 0) return null;
     return (
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <h2 className="font-display text-2xl font-bold">Most Read This Week</h2>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                {stories.map((story, idx) => (
-                    <Link
-                        key={story.id}
-                        to={`/story/${story.slug}`}
-                        className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-muted/50"
-                    >
-                        <span className="shrink-0 font-display text-3xl font-bold text-brand-primary/20">
-                            {String(idx + 1).padStart(2, '0')}
-                        </span>
-                        <div>
-                            <CategoryBadge category={story.category} />
-                            <h4 className="mt-1 text-sm font-semibold leading-snug line-clamp-3 group-hover:text-brand-primary transition-colors">
-                                {story.title}
-                            </h4>
-                            <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
-                                <Eye className="h-3 w-3" /> {story.view_count.toLocaleString()} views
-                            </div>
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+                {/* Main Feed Column */}
+                <div className="lg:col-span-8">
+                    <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
+                        <h2 className="font-display text-2xl font-bold uppercase tracking-wide">Analysis & Opinion</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+                        {feedStories.map(story => (
+                            <StoryCardVertical key={story.id} story={story} showExcerpt={true} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Right Sidebar (Most Read) */}
+                <div className="lg:col-span-4 space-y-8">
+                    <div>
+                        <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
+                            <h2 className="font-display text-xl font-bold uppercase tracking-wide">Most Read</h2>
                         </div>
-                    </Link>
-                ))}
+                        <div className="flex flex-col gap-5 divide-y divide-border/50">
+                            {mostRead.slice(0, 5).map((story, i) => (
+                                <div key={story.id} className={cn("flex flex-col gap-2", i > 0 ? "pt-5" : "")}>
+                                    <div className="flex items-start gap-4">
+                                        <span className="text-4xl font-display font-bold text-brand-primary/20 leading-none mt-1">
+                                            {i + 1}
+                                        </span>
+                                        <div>
+                                            <CategoryBadge category={story.category} className="mb-1 w-fit" />
+                                            <Link to={`/story/${story.slug}`} className="group block">
+                                                <h4 className="font-display text-sm font-bold leading-snug group-hover:text-brand-primary transition-colors">
+                                                    {story.title}
+                                                </h4>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Sidebar Ad Banner */}
+                    <div className="w-full h-[400px] sm:h-[600px] bg-muted flex flex-col items-center justify-center p-4">
+                        <span className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Advertisement</span>
+                        <div className="w-full max-w-[300px] h-[500px] border-2 border-dashed border-border flex items-center justify-center text-muted-foreground/50 font-bold text-center">
+                            300x500 Ad Unit
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
     );
 }
-
 
 // ══════════════════════════════════════════
 // LOADING SKELETON
 // ══════════════════════════════════════════
-
 function HomePageSkeleton() {
     return (
         <div className="animate-pulse">
-            {/* Hero skeleton */}
-            <Skeleton className="aspect-[21/9] w-full rounded-none sm:aspect-[3/1]" />
-
-            {/* Featured row skeleton */}
-            <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="overflow-hidden rounded-lg border border-border">
-                            <Skeleton className="aspect-video w-full" />
-                            <div className="p-4 space-y-3">
-                                <Skeleton className="h-4 w-16" />
-                                <Skeleton className="h-5 w-full" />
-                                <Skeleton className="h-5 w-3/4" />
-                                <Skeleton className="h-3 w-32" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* News strip skeleton */}
-            <div className="border-y border-border bg-card py-10">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <Skeleton className="h-7 w-40" />
-                    <div className="mt-6 flex gap-4">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="flex w-64 shrink-0 gap-3">
-                                <Skeleton className="h-20 w-20 rounded-md" />
-                                <div className="flex-1 space-y-2 py-1">
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-3/4" />
-                                    <Skeleton className="h-3 w-20" />
-                                </div>
-                            </div>
-                        ))}
+            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                <Skeleton className="h-8 w-48 mb-6" />
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className="lg:col-span-8"><Skeleton className="h-[500px] w-full rounded-xl" /></div>
+                    <div className="lg:col-span-4 space-y-4">
+                        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28 w-full rounded-lg" />)}
                     </div>
                 </div>
             </div>
@@ -456,7 +209,6 @@ function HomePageSkeleton() {
 // ══════════════════════════════════════════
 // HOMEPAGE
 // ══════════════════════════════════════════
-
 export default function HomePage() {
     const {
         breakingStories,
@@ -471,17 +223,23 @@ export default function HomePage() {
 
     if (isLoading) return <HomePageSkeleton />;
 
-
-
     return (
-        <>
+        <div className="bg-background">
             <BreakingNewsTicker stories={breakingStories} />
-            <HeroSection story={heroStory} />
-            <SecondaryFeaturedRow stories={featuredStories} />
-            <LatestNewsStrip stories={latestNews} />
-            <FeaturesSection stories={latestFeatures} />
-            <OpinionsSection stories={latestOpinions} />
-            <MostReadSection stories={mostRead} />
-        </>
+
+            <RecentNewsBlock heroStory={heroStory} latestNews={latestNews} />
+
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 my-2">
+                <BannerAdPlaceholder className="h-24 sm:h-32 bg-brand-primary/5 border-brand-primary/20 text-brand-primary" text="Premium Ad Space" />
+            </div>
+
+            <TopNewsDarkBlock featuredStories={featuredStories} />
+
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 mt-4 border-b border-border">
+                <BannerAdPlaceholder className="h-24" />
+            </div>
+
+            <TopNewsLightFeed opinions={latestOpinions} latest={latestFeatures} mostRead={mostRead} />
+        </div>
     );
 }

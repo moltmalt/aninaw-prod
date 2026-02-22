@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCategoryData } from '@/hooks/useCategoryData';
 import type { CategorySortOption } from '@/hooks/useCategoryData';
-import { formatRelativeTime } from '@/lib/utils';
+// removed formatRelativeTime
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import { StoryCardHorizontal } from '@/components/ui/StoryCardHorizontal';
+import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { BannerAdPlaceholder } from '@/components/ui/BannerAdPlaceholder';
 
 export default function CategoryPage() {
     const { category } = useParams<{ category: string }>();
@@ -61,36 +65,14 @@ export default function CategoryPage() {
                         <CategorySkeleton />
                     ) : stories.length > 0 ? (
                         <>
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                {stories.map((story) => (
-                                    <Link key={story.id} to={`/story/${story.slug}`} className="group block overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-lg">
-                                        <div className="aspect-video w-full overflow-hidden bg-muted">
-                                            {story.cover_image_url ? (
-                                                <img
-                                                    src={story.cover_image_url}
-                                                    alt={story.title}
-                                                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                                    loading="lazy"
-                                                />
-                                            ) : (
-                                                <div className="h-full w-full bg-muted/50" />
-                                            )}
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="font-display text-lg font-bold leading-tight group-hover:text-brand-primary line-clamp-3">
-                                                {story.title}
-                                            </h3>
-                                            <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                                                <span className="truncate max-w-[120px]">
-                                                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                                    {(story as any).authors?.name || 'Staff'}
-                                                </span>
-                                                {story.published_at && (
-                                                    <time>{formatRelativeTime(story.published_at)}</time>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </Link>
+                            <div className="flex flex-col gap-8 divide-y divide-border/50">
+                                {stories.map((story, i) => (
+                                    <StoryCardHorizontal
+                                        key={story.id}
+                                        story={story}
+                                        className={i > 0 ? "pt-8" : ""}
+                                        imageClassName="w-32 sm:w-48 lg:w-64"
+                                    />
                                 ))}
                             </div>
 
@@ -128,8 +110,10 @@ export default function CategoryPage() {
                 <aside className="space-y-10 border-l border-border pl-0 lg:pl-8 lg:border-t-0 border-t pt-8 lg:pt-0">
                     {/* Most Read in Category */}
                     <div>
-                        <h3 className="mb-4 font-display text-xl font-bold">Most Read</h3>
-                        <div className="space-y-6">
+                        <div className="flex items-center justify-between border-b-2 border-brand-black pb-2 mb-6">
+                            <h3 className="font-display text-xl font-bold uppercase tracking-wide">Most Read</h3>
+                        </div>
+                        <div className="flex flex-col gap-5 divide-y divide-border/50">
                             {isLoading ? (
                                 Array(4).fill(0).map((_, i) => (
                                     <div key={i} className="flex gap-4">
@@ -141,22 +125,26 @@ export default function CategoryPage() {
                                     </div>
                                 ))
                             ) : mostRead.map((story, i) => (
-                                <Link key={story.id} to={`/story/${story.slug}`} className="group flex items-start gap-4">
-                                    <span className="shrink-0 font-display text-2xl font-bold text-brand-primary/20">
-                                        {i + 1}
-                                    </span>
-                                    <div>
-                                        <h4 className="font-bold leading-tight group-hover:text-brand-primary line-clamp-2">
-                                            {story.title}
-                                        </h4>
-                                        <p className="mt-1 text-xs text-muted-foreground">
-                                            {story.view_count} views
-                                        </p>
+                                <div key={story.id} className={cn("flex flex-col gap-2", i > 0 ? "pt-5" : "")}>
+                                    <div className="flex items-start gap-4">
+                                        <span className="text-4xl font-display font-bold text-brand-primary/20 leading-none mt-1">
+                                            {i + 1}
+                                        </span>
+                                        <div>
+                                            <CategoryBadge category={story.category} className="mb-1 w-fit" />
+                                            <Link to={`/story/${story.slug}`} className="group block">
+                                                <h4 className="font-display text-sm font-bold leading-snug group-hover:text-brand-primary transition-colors">
+                                                    {story.title}
+                                                </h4>
+                                            </Link>
+                                        </div>
                                     </div>
-                                </Link>
+                                </div>
                             ))}
                         </div>
                     </div>
+
+                    <BannerAdPlaceholder className="h-[400px]" />
 
                     {/* Popular Tags Cloud */}
                     <div>
